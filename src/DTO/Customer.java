@@ -1,5 +1,7 @@
 package DTO;
 
+import java.util.Vector;
+
 public class Customer {
     private String name, phone;
     private int type, discount, ID;
@@ -22,6 +24,10 @@ public class Customer {
     public String getName(){return this.name;}
 
     public String getPhone(){return this.phone;}
+
+    public int getType() {
+        return type;
+    }
 
     public int getDiscount() {
         return discount;
@@ -46,5 +52,15 @@ public class Customer {
                 discount = 0;
                 break;
         }
+    }
+
+    public Vector toVector(){
+        Vector res = new Vector();
+        res.add(this.ID);
+        res.add(this.name);
+        res.add(this.phone);
+        res.add(this.type);
+        res.add(this.discount);
+        return res;
     }
 }
