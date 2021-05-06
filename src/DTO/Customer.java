@@ -1,15 +1,15 @@
 package DTO;
 
 public class Customer {
-    private String ID, name, phone;
-    int type, discount;
+    private String name, phone;
+    private int type, discount, ID;
 
     public Customer(){
-        this.ID = this.name = this.phone = "none";
-        type = -1;
+        this.name = this.phone = "none";
+        type = ID = -1;
     }
 
-    public Customer(String ID, String name, String phone, int type){
+    public Customer(int ID, String name, String phone, int type){
         this.ID = ID;
         this.name = name;
         this.phone = phone;
@@ -17,7 +17,7 @@ public class Customer {
         this.getDiscountFromType();
     }
 
-    public String getID(){return this.ID;}
+    public int getID(){return this.ID;}
 
     public String getName(){return this.name;}
 
