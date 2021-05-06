@@ -104,7 +104,7 @@ public class promotion_DAO {
 
         try{
             preparedStatement = conn.prepareStatement(sql);
-            preparedStatement.setString(1, ID);
+            preparedStatement.setInt(1, Integer.parseInt(ID));
 
             rowAffected = preparedStatement.executeUpdate();
         } catch (SQLException throwables) {
