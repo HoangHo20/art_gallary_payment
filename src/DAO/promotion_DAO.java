@@ -18,11 +18,20 @@ public class promotion_DAO {
             st = conn.createStatement();
             rs = st.executeQuery(sql);
             while(rs.next()){
+                Date dateEnd =  rs.getDate("DateEnd");
+                String DateEnd = "";
+
+                if(dateEnd == null){
+                    DateEnd = "none";
+                }
+                else{
+                    DateEnd = dateEnd.toString();
+                }
                 return new Promotion(String.valueOf(rs.getInt("ID")),
                         rs.getString("Name"),
                         rs.getString("Description"),
                         rs.getDate("DateStart").toString(),
-                        rs.getDate("DateEnd").toString(),
+                        DateEnd,
                         rs.getDouble("Discount_amount"),
                         rs.getInt("Discount_percentage"),
                         rs.getInt("Status"));
@@ -45,7 +54,12 @@ public class promotion_DAO {
             preparedStatement.setString(1, promotion.getName());
             preparedStatement.setString(2, promotion.getDescription());
             preparedStatement.setDate(3, new Date(promotion.getDateStart().getTime()));
-            preparedStatement.setDate(4, new Date(promotion.getDateEnd().getTime()));
+            if(promotion.getDateEnd() == null){
+                preparedStatement.setNull(4, Types.DATE);
+            }
+            else{
+                preparedStatement.setDate(4, new Date(promotion.getDateEnd().getTime()));
+            }
             preparedStatement.setDouble(5, promotion.getDiscount_amount());
             preparedStatement.setInt(6, promotion.getDiscount_percentage());
             preparedStatement.setInt(7, promotion.getCondition());
@@ -82,7 +96,12 @@ public class promotion_DAO {
             preparedStatement.setString(1, promotion.getName());
             preparedStatement.setString(2, promotion.getDescription());
             preparedStatement.setDate(3, new Date(promotion.getDateStart().getTime()));
-            preparedStatement.setDate(4, new Date(promotion.getDateEnd().getTime()));
+            if(promotion.getDateEnd() == null){
+                preparedStatement.setNull(4, Types.DATE);
+            }
+            else{
+                preparedStatement.setDate(4, new Date(promotion.getDateEnd().getTime()));
+            }
             preparedStatement.setDouble(5, promotion.getDiscount_amount());
             preparedStatement.setInt(6, promotion.getDiscount_percentage());
             preparedStatement.setInt(7, promotion.getCondition());

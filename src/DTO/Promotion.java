@@ -39,7 +39,9 @@ public class Promotion {
     }
 
     public Date getDateEnd() throws ParseException {
-
+        if(this.dateEnd.equals("none")){
+            return null;
+        }
         return new SimpleDateFormat("yyyy-MM-dd").parse(this.dateEnd);
     }
 
