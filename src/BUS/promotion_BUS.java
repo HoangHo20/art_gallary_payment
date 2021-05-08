@@ -1,20 +1,17 @@
 package BUS;
 
-import DAO.*;
-import DTO.Picture;
+import DAO.promotion_DAO;
 import DTO.Promotion;
-import DTO.Staff;
 
 import java.util.ArrayList;
 import java.util.Vector;
 
-public class staff_BUS {
-
-    public static Vector<Vector> getAllStaff(){
-        ArrayList<Staff> list_pic = staff_DAO.selectAll();
+public class promotion_BUS {
+    public static Vector<Vector> getAllPromotion(){
+        ArrayList<Promotion> list_pic = promotion_DAO.selectAll();
         Vector<Vector> res = new Vector<>();
 
-        for(Staff pic: list_pic){
+        for(Promotion pic: list_pic){
             Vector vector = pic.toVector();
             if(!vector.isEmpty()){
                 res.add(vector);
@@ -24,12 +21,12 @@ public class staff_BUS {
         return res;
     }
 
-    public static int updateStaff(ArrayList<Staff> list){
+    public static int updateStaff(ArrayList<Promotion> list){
         int count = 0;
-        for(Staff staff: list){
-            int rowAffected = staff_DAO.update(staff.getID(), staff);
+        for(Promotion staff: list){
+            int rowAffected = promotion_DAO.update(staff.getID(), staff);
             if(rowAffected == 0){
-                count += staff_DAO.insert(staff);
+                count += promotion_DAO.insert(staff);
             }
             count += rowAffected;
         }
@@ -37,6 +34,6 @@ public class staff_BUS {
     }
 
     public static int deleteStaff(String ID){
-        return staff_DAO.delete(Integer.parseInt(ID));
+        return promotion_DAO.delete(Integer.parseInt(ID));
     }
 }

@@ -1,12 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package GUI;
-import BUS.staff_BUS;
+
+import BUS.*;
+import DTO.Promotion;
 import DTO.Staff;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,32 +14,28 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Vector;
-import javax.swing.*;
-import javax.swing.table.*;
 
-/**
- *
- * @author duyph
- */
-public class staff_GUI extends javax.swing.JFrame {
+public class promotion_GUI extends JFrame {
+
 
     /**
      * Creates new form staff_GUI
      */
-    public staff_GUI() {
+    public promotion_GUI() {
         initComponents();
         initHeader();
         loadData();
     }
-    
+
     private void initHeader(){
         this.table_header = new Vector();
         this.table_header.add("ID");
         this.table_header.add("Name");
-        this.table_header.add("Phone");
-        this.table_header.add("Sex");
+        this.table_header.add("Descpition");
         this.table_header.add("Date start");
         this.table_header.add("Date end");
+        this.table_header.add("Discount_amount");
+        this.table_header.add("Discount_percentage");
         this.table_header.add("Status");
     }
 
@@ -72,10 +68,10 @@ public class staff_GUI extends javax.swing.JFrame {
                 data, table_header
         ) {
             Class[] types = new Class [] {
-                    String.class, String.class, String.class, String.class, String.class, String.class, Integer.class
+                    String.class, String.class, String.class, String.class, String.class, Double.class, Integer.class, Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                    false, true, true, true, true, true, true
+                    false, true, true, true, true, true, true, true
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -99,7 +95,7 @@ public class staff_GUI extends javax.swing.JFrame {
 
         frameLabel.setFont(new Font("Tahoma", 0, 14)); // NOI18N
         frameLabel.setHorizontalAlignment(JTextField.CENTER);
-        frameLabel.setText("Staff Management");
+        frameLabel.setText("Promotion Management");
         frameLabel.setCursor(new Cursor(Cursor.TEXT_CURSOR));
         frameLabel.setEditable(false);
 
@@ -171,7 +167,7 @@ public class staff_GUI extends javax.swing.JFrame {
     }// </editor-fold>
 
     private void loadData(){
-        this.data = staff_BUS.getAllStaff();
+        this.data = promotion_BUS.getAllPromotion();
         tableModel.setDataVector(data, this.table_header);
     }
 
@@ -190,34 +186,34 @@ public class staff_GUI extends javax.swing.JFrame {
     private boolean isValidRow(int index){
         String ID = (String) jTable3.getValueAt(index, 0);
         String name = (String) jTable3.getValueAt(index, 1);
-        String phone = (String) jTable3.getValueAt(index, 2);
-        String sex = (String) jTable3.getValueAt(index, 3);
-        String dateStart = (String) jTable3.getValueAt(index, 4);
-        String dateEnd  = (String) jTable3.getValueAt(index, 5);
+        String description = (String) jTable3.getValueAt(index, 2);
+        String dateStart = (String) jTable3.getValueAt(index, 3);
+        String dateEnd  = (String) jTable3.getValueAt(index, 4);
 
-        if(jTable3.getValueAt(index, 6) == null){
-            return false;
-        }
-        int status = (int) jTable3.getValueAt(index, 6);
-
-        if(name.equals(" ") || phone.equals(" ")){
+        if(jTable3.getValueAt(index, 5) == null || jTable3.getValueAt(index, 6) == null || jTable3.getValueAt(index, 7) == null){
             return false;
         }
 
-        if(!sex.toLowerCase().equals("male") && !sex.toLowerCase().equals("female")){
+        double discount_amount = (double) jTable3.getValueAt(index, 5);
+        int discount_percent = (int) jTable3.getValueAt(index, 6);
+        int status = (Integer) jTable3.getValueAt(index, 7);
+
+        if(name.equals(" ") || description.equals(" ")){
             return false;
         }
 
         try{
             new SimpleDateFormat("yyyy-MM-dd").parse(dateStart);
-            if(dateEnd != null && !dateEnd.isEmpty()){
-                new SimpleDateFormat("yyyy-MM-dd").parse(dateEnd);
-            }
+            new SimpleDateFormat("yyyy-MM-dd").parse(dateEnd);
         } catch (ParseException e) {
             return false;
         }
 
-        if(status < 0){
+        if(dateStart.compareTo(dateEnd) < 0){
+            return false;
+        }
+
+        if(discount_amount < 0 || discount_percent < 0 || status < 0){
             return false;
         }
 
@@ -235,7 +231,8 @@ public class staff_GUI extends javax.swing.JFrame {
                 vector.add("");
                 vector.add("");
                 vector.add("");
-                vector.add("");
+                vector.add(0.0);
+                vector.add(0);
                 vector.add(1);
 
                 this.data.add(vector);
@@ -249,7 +246,8 @@ public class staff_GUI extends javax.swing.JFrame {
             vector.add("");
             vector.add("");
             vector.add("");
-            vector.add("");
+            vector.add(0.0);
+            vector.add(0);
             vector.add(1);
 
             this.data.add(vector);
@@ -260,36 +258,33 @@ public class staff_GUI extends javax.swing.JFrame {
     }
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
-        ArrayList<Staff> list = new ArrayList<>();
+        ArrayList<Promotion> list = new ArrayList<>();
 
         for(int row = 0; row < data.size(); row++){
             if(isValidRow(row)){
                 String ID = (String) jTable3.getValueAt(row, 0);
                 String name = (String) jTable3.getValueAt(row, 1);
-                String phone = (String) jTable3.getValueAt(row, 2);
-                String sex = (String) jTable3.getValueAt(row, 3);
-                String dateStart = (String) jTable3.getValueAt(row, 4);
-                String dateEnd  = (String) jTable3.getValueAt(row, 5);
-                if(dateEnd == null || dateEnd.isEmpty()){
-                    dateEnd = "none";
-                }
-                int status = (Integer) jTable3.getValueAt(row, 6);
-                list.add(new Staff(ID, name, phone, sex, dateStart, dateEnd, status));
+                String description = (String) jTable3.getValueAt(row, 2);
+                String dateStart = (String) jTable3.getValueAt(row, 3);
+                String dateEnd  = (String) jTable3.getValueAt(row, 4);
+                double discount_amount = (double) jTable3.getValueAt(row, 5);
+                int discount_percent = (int) jTable3.getValueAt(row, 6);
+                int status = (Integer) jTable3.getValueAt(row, 7);
+                list.add(new Promotion(ID, name, description, dateStart, dateEnd, discount_amount, discount_percent, status));
             }
         }
 
-        if(staff_BUS.updateStaff(list) > 0){
+        if(promotion_BUS.updateStaff(list) > 0){
             this.loadData();
         }
     }
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
         int selectedRow = jTable3.getSelectedRow();
-
         if(selectedRow >= 0){
             String ID = (String) jTable3.getValueAt(selectedRow, 0);
 
-            staff_BUS.deleteStaff(ID);
+            promotion_BUS.deleteStaff(ID);
             this.loadData();
         }
     }

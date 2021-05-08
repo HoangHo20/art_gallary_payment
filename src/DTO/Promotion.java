@@ -1,5 +1,6 @@
 package DTO;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -34,14 +35,10 @@ public class Promotion {
     }
 
     public Date getDateStart() throws ParseException {
-
         return new SimpleDateFormat("yyyy-MM-dd").parse(this.dateStart);
     }
 
     public Date getDateEnd() throws ParseException {
-        if(this.dateEnd.equals("none")){
-            return null;
-        }
         return new SimpleDateFormat("yyyy-MM-dd").parse(this.dateEnd);
     }
 
@@ -67,21 +64,25 @@ public class Promotion {
 
     public Vector toVector(){
         Vector res = new Vector();
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         try{
             res.add(this.getID());
             res.add(this.getName());
             res.add(this.getDescription());
-            res.add(new String(String.valueOf(this.getDateStart())));
-            res.add(new String(String.valueOf(this.getDateEnd())));
+            String dateStart = formatter.format(this.getDateStart());
+            String dateEnd = formatter.format(this.getDateEnd());
+            res.add(dateStart);
+            res.add(dateEnd);
             res.add(this.getDiscount_amount());
             res.add(this.getDiscount_percentage());
             res.add(this.getCondition());
+
+            return res;
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        finally {
-            return res;
-        }
+
+        return new Vector();
     }
 
 }
