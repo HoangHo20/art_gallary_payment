@@ -7,7 +7,14 @@ package GUI;
 import BUS.staff_BUS;
 import DTO.Staff;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Vector;
+import javax.swing.*;
 import javax.swing.table.*;
 
 /**
@@ -45,145 +52,127 @@ public class staff_GUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jTable1 = new javax.swing.JTable();
-        jTable2 = new javax.swing.JTable();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jTable3 = new javax.swing.JTable();
-        frameLabel = new javax.swing.JTextField();
-        jPanel1 = new javax.swing.JPanel();
-        phone = new javax.swing.JTextField();
-        dateStart = new javax.swing.JTextField();
-        dateEnd = new javax.swing.JTextField();
-        name = new javax.swing.JTextField();
-        sex = new javax.swing.JTextField();
-        status = new javax.swing.JTextField();
-        name_lb = new javax.swing.JLabel();
-        sex_lb = new javax.swing.JLabel();
-        status_lb = new javax.swing.JLabel();
-        phone_lb = new javax.swing.JLabel();
-        dateStart_lb = new javax.swing.JLabel();
-        dateEnd_lb = new javax.swing.JLabel();
+        jTable1 = new JTable();
+        jTable2 = new JTable();
+        jScrollPane3 = new JScrollPane();
+        jTable3 = new JTable();
+        frameLabel = new JTextField();
+        jPanel1 = new JPanel();
+        addBtn = new JButton();
+        applyBtn = new JButton();
+        removeBtn = new JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jTable3.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jTable3MouseClicked(evt);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+        data = new Vector<>();
+        initHeader();
+
+        tableModel = new DefaultTableModel(
+                data, table_header
+        ) {
+            Class[] types = new Class [] {
+                    String.class, String.class, String.class, String.class, String.class, String.class, Integer.class
+            };
+            boolean[] canEdit = new boolean [] {
+                    false, true, true, true, true, true, true
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
             }
-        });
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        };
+
+        jTable3.setModel(this.tableModel);
+
+
+        DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer();
+        cellRenderer.setHorizontalAlignment(JLabel.CENTER);
+        jTable3.getColumnModel().getColumn(0).setCellRenderer(cellRenderer);
+
+        jTable3.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jScrollPane3.setViewportView(jTable3);
 
-        frameLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        frameLabel.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        frameLabel.setFont(new Font("Tahoma", 0, 14)); // NOI18N
+        frameLabel.setHorizontalAlignment(JTextField.CENTER);
         frameLabel.setText("Staff Management");
-        frameLabel.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+        frameLabel.setCursor(new Cursor(Cursor.TEXT_CURSOR));
+        frameLabel.setEditable(false);
 
-        phone.setMinimumSize(new java.awt.Dimension(100, 20));
+        addBtn.setText("Add");
+        addBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
-        dateStart.setMinimumSize(new java.awt.Dimension(100, 20));
+        applyBtn.setText("Apply");
+        applyBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
-        dateEnd.setMinimumSize(new java.awt.Dimension(100, 20));
+        removeBtn.setText("Remove");
+        removeBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                jButton3ActionPerformed(e);
+            }
+        });
 
-        name.setMinimumSize(new java.awt.Dimension(100, 20));
-
-        sex.setMinimumSize(new java.awt.Dimension(100, 20));
-
-        status.setMinimumSize(new java.awt.Dimension(100, 20));
-
-        name_lb.setText("Name");
-
-        sex_lb.setText("Sex");
-
-        status_lb.setText("Status");
-
-        phone_lb.setText("Phone");
-
-        dateStart_lb.setText("Date start");
-
-        dateEnd_lb.setText("Date end");
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(79, 79, 79)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(name_lb)
-                    .addComponent(sex_lb)
-                    .addComponent(status_lb))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(status, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
-                    .addComponent(sex, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(name, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(dateStart_lb, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(phone_lb, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(dateEnd_lb, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addGap(10, 10, 10)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(phone, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
-                    .addComponent(dateStart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(dateEnd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(157, 157, 157))
+                jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(127, 127, 127)
+                                .addComponent(addBtn)
+                                .addGap(222, 222, 222)
+                                .addComponent(applyBtn)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(removeBtn)
+                                .addGap(136, 136, 136))
         );
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(phone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(name_lb)
-                    .addComponent(phone_lb))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(dateStart, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(sex, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(sex_lb)
-                    .addComponent(dateStart_lb))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(dateEnd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(status, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(status_lb)
-                    .addComponent(dateEnd_lb))
-                .addContainerGap(18, Short.MAX_VALUE))
+                jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addContainerGap(76, Short.MAX_VALUE)
+                                .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(addBtn)
+                                        .addComponent(applyBtn)
+                                        .addComponent(removeBtn))
+                                .addContainerGap())
         );
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(frameLabel, javax.swing.GroupLayout.Alignment.TRAILING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 900, Short.MAX_VALUE)
-            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(frameLabel, GroupLayout.Alignment.TRAILING)
+                        .addComponent(jScrollPane3, GroupLayout.DEFAULT_SIZE, 900, Short.MAX_VALUE)
+                        .addComponent(jPanel1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(frameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(13, 13, 13)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(190, Short.MAX_VALUE))
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(frameLabel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jScrollPane3, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
+                                .addGap(13, 13, 13)
+                                .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>
 
     private void loadData(){
         this.data = staff_BUS.getAllStaff();
-        
-        jTable3.setModel(new DefaultTableModel(data, this.table_header){
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        });
+        tableModel.setDataVector(data, this.table_header);
     }
 
 //    private Staff toStaff(Vector vector){
@@ -198,53 +187,106 @@ public class staff_GUI extends javax.swing.JFrame {
 //        return st
 //    }
 
+    private boolean isValidRow(int index){
+        String ID = (String) jTable3.getValueAt(index, 0);
+        String name = (String) jTable3.getValueAt(index, 1);
+        String phone = (String) jTable3.getValueAt(index, 2);
+        String sex = (String) jTable3.getValueAt(index, 3);
+        String dateStart = (String) jTable3.getValueAt(index, 4);
+        String dateEnd  = (String) jTable3.getValueAt(index, 5);
+        int status = (Integer) jTable3.getValueAt(index, 6);
 
-    private void jTable3MouseClicked(java.awt.event.MouseEvent evt) {
-        // TODO add your handling code here:
-        int selectedRowIndex = jTable3.getSelectedRow();
-        Vector vector = this.data.get(selectedRowIndex);
+        if(name.equals(" ") || phone.equals(" ")){
+            return false;
+        }
 
-        String ID = (String) vector.get(0);
-        String name = (String) vector.get(1);
-        String phone = (String) vector.get(2);
-        String sex = (String) vector.get(3);
-        String dateStart = (String) vector.get(4);
-        String dateEnd  = (String) vector.get(5);
-        int status = (Integer) vector.get(6);
+        if(!sex.toLowerCase().equals("male") && !sex.toLowerCase().equals("female")){
+            return false;
+        }
 
-        this.name.setText(name);
-        this.phone.setText(phone);
-        this.sex.setText(sex);
-        this.dateStart.setText(dateStart);
-        this.dateEnd.setText(dateEnd);
-        this.status.setText(String.valueOf(status));
+        try{
+            new SimpleDateFormat("yyyy-MM-dd").parse(dateStart);
+            if(dateEnd != null && !dateEnd.isEmpty()){
+                new SimpleDateFormat("yyyy-MM-dd").parse(dateEnd);
+            }
+        } catch (ParseException e) {
+            return false;
+        }
+
+        return true;
+    }
 
 
-        
-    }//GEN-LAST:event_jTable3MouseClicked
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
+        Vector vector = new Vector();
+        if(!data.isEmpty()){
+            if(isValidRow(data.size() - 1)){
+                int ID = Integer.parseInt(String.valueOf(data.get(data.size() - 1).get(0))) + 1;
+                vector.add(String.valueOf(ID));
+            }
+        }
+        else {
+            int ID = 1;
+            vector.add(String.valueOf(ID));
+        }
+        vector.add("");
+        vector.add("");
+        vector.add("");
+        vector.add("");
+        vector.add("");
+        vector.add(1);
 
-    
+        this.data.add(vector);
+        tableModel.setDataVector(data, table_header);
+
+    }
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
+        ArrayList<Staff> list = new ArrayList<>();
+
+        for(int row = 0; row < data.size(); row++){
+            if(isValidRow(row)){
+                String ID = (String) jTable3.getValueAt(row, 0);
+                String name = (String) jTable3.getValueAt(row, 1);
+                String phone = (String) jTable3.getValueAt(row, 2);
+                String sex = (String) jTable3.getValueAt(row, 3);
+                String dateStart = (String) jTable3.getValueAt(row, 4);
+                String dateEnd  = (String) jTable3.getValueAt(row, 5);
+                if(dateEnd == null || dateEnd.isEmpty()){
+                    dateEnd = "none";
+                }
+                int status = (Integer) jTable3.getValueAt(row, 6);
+                list.add(new Staff(ID, name, phone, sex, dateStart, dateEnd, status));
+            }
+        }
+
+        staff_BUS.updateStaff(list);
+        this.loadData();
+    }
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
+        int selectedRow = jTable3.getSelectedRow();
+
+        String ID = (String) jTable3.getValueAt(selectedRow, 0);
+
+        staff_BUS.deleteStaff(ID);
+        this.loadData();
+    }
+
+
     private Vector table_header;
     private Vector<Vector> data;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel status_lb;
-    private javax.swing.JLabel phone_lb;
-    private javax.swing.JLabel dateStart_lb;
-    private javax.swing.JLabel dateEnd_lb;
-    private javax.swing.JLabel name_lb;
-    private javax.swing.JLabel sex_lb;
+    private javax.swing.JButton addBtn;
+    private javax.swing.JButton applyBtn;
+    private javax.swing.JButton removeBtn;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTable jTable1;
     private javax.swing.JTable jTable2;
     private javax.swing.JTable jTable3;
-    private javax.swing.JTextField dateEnd;
-    private javax.swing.JTextField name;
-    private javax.swing.JTextField sex;
-    private javax.swing.JTextField status;
-    private javax.swing.JTextField phone;
-    private javax.swing.JTextField dateStart;
     private javax.swing.JTextField frameLabel;
+    private DefaultTableModel tableModel;
     // End of variables declaration//GEN-END:variables
 }

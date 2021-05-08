@@ -1,5 +1,7 @@
 package DTO;
 
+import javax.lang.model.util.Types;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -64,20 +66,27 @@ public class Staff {
 
     public Vector toVector() {
         Vector res = new Vector();
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         try{
             res.add(this.getID());
             res.add(this.getName());
             res.add(this.getPhone());
             res.add(this.getSex());
-            res.add(new String(String.valueOf(this.getDateStart())));
-            res.add(new String(String.valueOf(this.getDateEnd())));
+            String dateStart = formatter.format(this.getDateStart());
+            String dateEnd = null;
+            if(this.getDateEnd() != null){
+                dateEnd = formatter.format(this.getDateEnd());
+            }
+            res.add(dateStart);
+            res.add(dateEnd);
             res.add(this.getStatus());
+
+            return res;
         }
         catch (ParseException e){
             e.printStackTrace();
         }
-        finally {
-            return res;
-        }
+
+        return new Vector();
     }
 }

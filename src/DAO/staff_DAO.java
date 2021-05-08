@@ -5,6 +5,7 @@ import DTO.Promotion;
 import DTO.Staff;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class staff_DAO {
@@ -19,20 +20,23 @@ public class staff_DAO {
             st = conn.createStatement();
             rs = st.executeQuery(sql);
             while(rs.next()){
-                Date dateEnd =  rs.getDate("DateEnd");
+                java.sql.Date dateEnd =  rs.getDate("DateEnd");
+                java.sql.Date dateStart = rs.getDate("DateStart");
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                String DateStart =  formatter.format(new java.util.Date(dateStart.getTime()));
                 String DateEnd = "";
 
                 if(dateEnd == null){
                     DateEnd = "none";
                 }
                 else{
-                    DateEnd = dateEnd.toString();
+                    DateEnd = formatter.format(new java.util.Date(dateEnd.getTime()));
                 }
                 res.add(new Staff(String.valueOf(rs.getInt("ID")),
                         rs.getString("Name"),
                         rs.getString("Phone"),
                         rs.getString("Sex"),
-                        rs.getDate("DateStart").toString(),
+                        DateStart,
                         DateEnd,
                         rs.getInt("Status")));
             }
@@ -53,20 +57,23 @@ public class staff_DAO {
             st = conn.createStatement();
             rs = st.executeQuery(sql);
             while(rs.next()){
-                Date dateEnd =  rs.getDate("DateEnd");
+                java.sql.Date dateEnd =  rs.getDate("DateEnd");
+                java.sql.Date dateStart = rs.getDate("DateStart");
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                String DateStart =  formatter.format(new java.util.Date(dateStart.getTime()));
                 String DateEnd = "";
 
                 if(dateEnd == null){
                     DateEnd = "none";
                 }
                 else{
-                    DateEnd = dateEnd.toString();
+                    DateEnd = formatter.format(new java.util.Date(dateEnd.getTime()));
                 }
                 return (new Staff(String.valueOf(rs.getInt("ID")),
                         rs.getString("Name"),
                         rs.getString("Phone"),
                         rs.getString("Sex"),
-                        rs.getDate("DateStart").toString(),
+                        DateStart,
                         DateEnd,
                         rs.getInt("Status")));
             }
@@ -93,7 +100,7 @@ public class staff_DAO {
                 preparedStatement.setNull(5, Types.DATE);
             }
             else{
-                preparedStatement.setDate(4, new Date(staff.getDateEnd().getTime()));
+                preparedStatement.setDate(5, new Date(staff.getDateEnd().getTime()));
             }
             preparedStatement.setInt(6, staff.getStatus());
 
@@ -129,7 +136,7 @@ public class staff_DAO {
                 preparedStatement.setNull(5, Types.DATE);
             }
             else{
-                preparedStatement.setDate(4, new Date(staff.getDateEnd().getTime()));
+                preparedStatement.setDate(5, new Date(staff.getDateEnd().getTime()));
             }
             preparedStatement.setDouble(6, staff.getStatus());
             preparedStatement.setInt(7, Integer.parseInt(staff.getID()));
@@ -141,7 +148,7 @@ public class staff_DAO {
         return rowAffected;
     }
 
-    public static int delete(String ID){
+    public static int delete(int ID){
         String sql = "DELETE from staff " + "where ID = ?";
         Connection conn = Global_DAO.getConnection();
         PreparedStatement preparedStatement = null;
@@ -150,7 +157,7 @@ public class staff_DAO {
 
         try{
             preparedStatement = conn.prepareStatement(sql);
-            preparedStatement.setInt(1, Integer.parseInt(ID));
+            preparedStatement.setInt(1, ID);
 
             rowAffected = preparedStatement.executeUpdate();
         } catch (SQLException throwables) {
