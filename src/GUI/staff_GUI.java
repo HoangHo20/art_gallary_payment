@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 package GUI;
+import BUS.promotion_BUS;
 import BUS.staff_BUS;
 import DTO.Staff;
 
@@ -72,10 +73,10 @@ public class staff_GUI extends javax.swing.JFrame {
                 data, table_header
         ) {
             Class[] types = new Class [] {
-                    String.class, String.class, String.class, String.class, String.class, String.class, Integer.class
+                    String.class, String.class, String.class, String.class, String.class, String.class, String.class
             };
             boolean[] canEdit = new boolean [] {
-                    false, true, true, true, true, true, true
+                    false, true, true, true, true, true, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -84,6 +85,31 @@ public class staff_GUI extends javax.swing.JFrame {
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
+            }
+
+            @Override
+            public void fireTableCellUpdated(int row, int column) {
+                if(column == 4 || column == 5){
+                    String dateStart = (String) jTable3.getValueAt(row, 4);
+                    String dateEnd  = (String) jTable3.getValueAt(row, 5);
+
+                    if(dateEnd != null && !dateEnd.isEmpty()){
+                        if(checkDate(dateEnd) && checkDate(dateStart)){
+                            if(dateStart.compareTo(dateEnd) <= 0 && staff_BUS.checkStatus(dateEnd)){
+                                this.setValueAt("Valid", row, 6);
+                            }
+                            else{
+                                this.setValueAt("Invalid", row, 6);
+                            }
+                        }
+                        else{
+                            this.setValueAt("Invalid", row, 6);
+                        }
+                    }
+                    else{
+                        this.setValueAt("Valid", row, 6);
+                    }
+                }
             }
         };
 
@@ -187,6 +213,15 @@ public class staff_GUI extends javax.swing.JFrame {
 //        return st
 //    }
 
+    private boolean checkDate(String date){
+        try{
+            new SimpleDateFormat("yyyy-MM-dd").parse(date);
+        } catch (ParseException e) {
+            return false;
+        }
+        return true;
+    }
+
     private boolean isValidRow(int index){
         String ID = (String) jTable3.getValueAt(index, 0);
         String name = (String) jTable3.getValueAt(index, 1);
@@ -198,7 +233,6 @@ public class staff_GUI extends javax.swing.JFrame {
         if(jTable3.getValueAt(index, 6) == null){
             return false;
         }
-        int status = (int) jTable3.getValueAt(index, 6);
 
         if(name.equals(" ") || phone.equals(" ")){
             return false;
@@ -217,9 +251,6 @@ public class staff_GUI extends javax.swing.JFrame {
             return false;
         }
 
-        if(status < 0){
-            return false;
-        }
 
         return true;
     }
@@ -236,7 +267,7 @@ public class staff_GUI extends javax.swing.JFrame {
                 vector.add("");
                 vector.add("");
                 vector.add("");
-                vector.add(1);
+                vector.add("Invalid");
 
                 this.data.add(vector);
                 tableModel.setDataVector(data, table_header);
@@ -250,7 +281,7 @@ public class staff_GUI extends javax.swing.JFrame {
             vector.add("");
             vector.add("");
             vector.add("");
-            vector.add(1);
+            vector.add("Invalid");
 
             this.data.add(vector);
             tableModel.setDataVector(data, table_header);
@@ -273,8 +304,7 @@ public class staff_GUI extends javax.swing.JFrame {
                 if(dateEnd == null || dateEnd.isEmpty()){
                     dateEnd = "none";
                 }
-                int status = (Integer) jTable3.getValueAt(row, 6);
-                list.add(new Staff(ID, name, phone, sex, dateStart, dateEnd, status));
+                list.add(new Staff(ID, name, phone, sex, dateStart, dateEnd));
             }
         }
 

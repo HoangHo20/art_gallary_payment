@@ -3,6 +3,8 @@ package BUS;
 import DAO.promotion_DAO;
 import DTO.Promotion;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -35,5 +37,18 @@ public class promotion_BUS {
 
     public static int deleteStaff(String ID){
         return promotion_DAO.delete(Integer.parseInt(ID));
+    }
+
+    public static boolean checkStatus(String dateEnd){
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime now = LocalDateTime.now();
+        String local_date = dtf.format(now);
+
+        if(dateEnd.compareTo(local_date) < 0){
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 }
