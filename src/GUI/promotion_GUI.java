@@ -68,10 +68,10 @@ public class promotion_GUI extends JFrame {
                 data, table_header
         ) {
             Class[] types = new Class [] {
-                    String.class, String.class, String.class, String.class, String.class, Double.class, Integer.class, Integer.class
+                    String.class, String.class, String.class, String.class, String.class, Double.class, Integer.class, String.class
             };
             boolean[] canEdit = new boolean [] {
-                    false, true, true, true, true, true, true, true
+                    false, true, true, true, true, true, true, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -80,6 +80,27 @@ public class promotion_GUI extends JFrame {
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
+            }
+
+            @Override
+            public void fireTableCellUpdated(int row, int column) {
+                if(column == 3 || column == 4){
+                    String dateStart = (String) jTable3.getValueAt(row, 3);
+                    String dateEnd  = (String) jTable3.getValueAt(row, 4);
+
+                    if(checkDate(dateEnd) && checkDate(dateStart)){
+                        if(dateStart.compareTo(dateEnd) <= 0 && promotion_BUS.checkStatus(dateEnd)){
+                            this.setValueAt("Valid", row, 7);
+                        }
+                        else{
+                            this.setValueAt("Invalid", row, 7);
+                        }
+                    }
+                    else{
+                        this.setValueAt("Invalid", row, 7);
+                    }
+                }
+
             }
         };
 
@@ -183,20 +204,27 @@ public class promotion_GUI extends JFrame {
 //        return st
 //    }
 
+    private boolean checkDate(String date){
+        try{
+            new SimpleDateFormat("yyyy-MM-dd").parse(date);
+        } catch (ParseException e) {
+            return false;
+        }
+        return true;
+    }
+
     private boolean isValidRow(int index){
-        String ID = (String) jTable3.getValueAt(index, 0);
         String name = (String) jTable3.getValueAt(index, 1);
         String description = (String) jTable3.getValueAt(index, 2);
         String dateStart = (String) jTable3.getValueAt(index, 3);
         String dateEnd  = (String) jTable3.getValueAt(index, 4);
 
-        if(jTable3.getValueAt(index, 5) == null || jTable3.getValueAt(index, 6) == null || jTable3.getValueAt(index, 7) == null){
+        if(jTable3.getValueAt(index, 5) == null || jTable3.getValueAt(index, 6) == null){
             return false;
         }
 
         double discount_amount = (double) jTable3.getValueAt(index, 5);
         int discount_percent = (int) jTable3.getValueAt(index, 6);
-        int status = (Integer) jTable3.getValueAt(index, 7);
 
         if(name.equals(" ") || description.equals(" ")){
             return false;
@@ -209,11 +237,11 @@ public class promotion_GUI extends JFrame {
             return false;
         }
 
-        if(dateStart.compareTo(dateEnd) < 0){
+        if(dateStart.compareTo(dateEnd) > 0){
             return false;
         }
 
-        if(discount_amount < 0 || discount_percent < 0 || status < 0){
+        if(discount_amount < 0 || discount_percent < 0){
             return false;
         }
 
@@ -233,7 +261,7 @@ public class promotion_GUI extends JFrame {
                 vector.add("");
                 vector.add(0.0);
                 vector.add(0);
-                vector.add(1);
+                vector.add("Invalid");
 
                 this.data.add(vector);
                 tableModel.setDataVector(data, table_header);
@@ -248,7 +276,7 @@ public class promotion_GUI extends JFrame {
             vector.add("");
             vector.add(0.0);
             vector.add(0);
-            vector.add(1);
+            vector.add("Invalid");
 
             this.data.add(vector);
             tableModel.setDataVector(data, table_header);
@@ -269,8 +297,7 @@ public class promotion_GUI extends JFrame {
                 String dateEnd  = (String) jTable3.getValueAt(row, 4);
                 double discount_amount = (double) jTable3.getValueAt(row, 5);
                 int discount_percent = (int) jTable3.getValueAt(row, 6);
-                int status = (Integer) jTable3.getValueAt(row, 7);
-                list.add(new Promotion(ID, name, description, dateStart, dateEnd, discount_amount, discount_percent, status));
+                list.add(new Promotion(ID, name, description, dateStart, dateEnd, discount_amount, discount_percent));
             }
         }
 
