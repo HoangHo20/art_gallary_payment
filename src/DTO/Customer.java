@@ -41,12 +41,9 @@ public class Customer {
     private void getDiscountFromType(){
         switch (this.type){
             case 1:
-                // set value of discount
+                discount = 5;
                 break;
 
-            case 2:
-
-                break;
 
             default:
                 discount = 0;

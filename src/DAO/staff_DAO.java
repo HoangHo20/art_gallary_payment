@@ -37,8 +37,7 @@ public class staff_DAO {
                         rs.getString("Phone"),
                         rs.getString("Sex"),
                         DateStart,
-                        DateEnd,
-                        rs.getInt("Status")));
+                        DateEnd));
             }
         } catch (Exception throwables) {
             throwables.printStackTrace();
@@ -74,8 +73,7 @@ public class staff_DAO {
                         rs.getString("Phone"),
                         rs.getString("Sex"),
                         DateStart,
-                        DateEnd,
-                        rs.getInt("Status")));
+                        DateEnd));
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();

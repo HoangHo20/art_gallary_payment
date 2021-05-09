@@ -4,6 +4,8 @@ import javax.lang.model.util.Types;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Vector;
 
@@ -16,14 +18,14 @@ public class Staff {
     private String dateEnd;
     private int status;
 
-    public Staff(String ID, String name, String phone, String sex, String dateStart, String dateEnd, int status){
+    public Staff(String ID, String name, String phone, String sex, String dateStart, String dateEnd){
         this.ID = ID;
         this.name = name;
         this.phone = phone;
         this.sex = sex;
         this.dateStart = dateStart;
         this.dateEnd = dateEnd;
-        this.status = status;
+        this.setStatus();
     }
 
     public Staff(){ }
@@ -62,7 +64,23 @@ public class Staff {
 
     public void setDateEnd(String dateEnd){this.dateEnd = dateEnd;}
 
-    public void setStatus(int status){this.status = status;}
+    public void setStatus(){
+        if(this.dateEnd.equals("none")){
+            status = 1;
+        }
+        else{
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDateTime now = LocalDateTime.now();
+            String local_date = dtf.format(now);
+
+            if(dateEnd.compareTo(local_date) < 0){
+                status = 0;
+            }
+            else{
+                status = 1;
+            }
+        }
+    }
 
     public Vector toVector() {
         Vector res = new Vector();
@@ -79,7 +97,12 @@ public class Staff {
             }
             res.add(dateStart);
             res.add(dateEnd);
-            res.add(this.getStatus());
+            if(this.getStatus() == 1){
+                res.add("Valid");
+            }
+            else{
+                res.add("Invalid");
+            }
 
             return res;
         }

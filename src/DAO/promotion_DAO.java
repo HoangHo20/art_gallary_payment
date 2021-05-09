@@ -26,15 +26,14 @@ public class promotion_DAO {
                 java.sql.Date dateStart = rs.getDate("DateStart");
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                 String DateStart =  formatter.format(new java.util.Date(dateStart.getTime()));
-                String DateEnd = formatter.format(new java.util.Date(dateStart.getTime()));
+                String DateEnd = formatter.format(new java.util.Date(dateEnd.getTime()));
                 res.add(new Promotion(String.valueOf(rs.getInt("ID")),
                         rs.getString("Name"),
                         rs.getString("Description"),
                         DateStart,
                         DateEnd,
                         rs.getDouble("Discount_amount"),
-                        rs.getInt("Discount_percentage"),
-                        rs.getInt("Status")));
+                        rs.getInt("Discount_percentage")));
             }
         } catch (Exception throwables) {
             throwables.printStackTrace();
@@ -64,8 +63,7 @@ public class promotion_DAO {
                         DateStart,
                         DateEnd,
                         rs.getDouble("Discount_amount"),
-                        rs.getInt("Discount_percentage"),
-                        rs.getInt("Status"));
+                        rs.getInt("Discount_percentage"));
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
