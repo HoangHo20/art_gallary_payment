@@ -5,6 +5,7 @@ import DTO.Promotion;
 import DTO.Staff;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -52,7 +53,12 @@ public class promotion_GUI extends JFrame {
         jTable2 = new JTable();
         jScrollPane3 = new JScrollPane();
         jTable3 = new JTable();
-        frameLabel = new JTextField();
+        frameLabel = new JTextField(){
+            @Override
+            public void setBorder(Border border) {
+                // No!
+            }
+        };
         jPanel1 = new JPanel();
         addBtn = new JButton();
         applyBtn = new JButton();
@@ -183,6 +189,9 @@ public class promotion_GUI extends JFrame {
                                 .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
 
         pack();
     }// </editor-fold>
