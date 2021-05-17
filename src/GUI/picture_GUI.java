@@ -118,11 +118,11 @@ public class picture_GUI extends JFrame {
 //        });
 
         removeBtn.setText("Remove");
-//        removeBtn.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                jButton3ActionPerformed(e);
-//            }
-//        });
+        removeBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                jButton3ActionPerformed(e);
+            }
+        });
 
         GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -227,7 +227,17 @@ public class picture_GUI extends JFrame {
             tableModel.setDataVector(data, table_header);
         }
 
+    }
 
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
+        int selectedRow = jTable3.getSelectedRow();
+        if(selectedRow >= 0){
+            String barcode = (String) jTable3.getValueAt(selectedRow, 1);
+
+            picture_BUS.deletePicture(barcode);
+            this.loadData();
+        }
     }
 
 

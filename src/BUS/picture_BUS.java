@@ -1,6 +1,7 @@
 package BUS;
 
 import DAO.picture_DAO;
+import DAO.promotion_DAO;
 import DTO.Picture;
 
 import java.util.ArrayList;
@@ -17,5 +18,9 @@ public class picture_BUS {
         }
 
         return res;
+    }
+
+    public static int deletePicture(String barcode){
+        return picture_DAO.delete(barcode);
     }
 }
