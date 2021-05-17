@@ -104,11 +104,11 @@ public class picture_GUI extends JFrame {
         frameLabel.setEditable(false);
 
         addBtn.setText("Add");
-//        addBtn.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent evt) {
-//                jButton1ActionPerformed(evt);
-//            }
-//        });
+        addBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         applyBtn.setText("Apply");
 //        applyBtn.addActionListener(new ActionListener() {
@@ -178,41 +178,57 @@ public class picture_GUI extends JFrame {
         tableModel.setDataVector(data, this.table_header);
     }
 
-//    private Staff toStaff(Vector vector){
-//        String ID = (String) vector.get(0);
-//        String name = (String) vector.get(1);
-//        String phone = (String) vector.get(2);
-//        String sex = (String) vector.get(3);
-//        String dateStart = (String) vector.get(4);
-//        String dateEnd  = (String) vector.get(5);
-//        int status = (Integer) vector.get(6);
-//
-//        return st
-//    }
-
 
 
     private boolean isValidRow(int index){
-        Integer price = (Integer) jTable3.getValueAt(index, 2);
-        Integer type = (Integer) jTable3.getValueAt(index, 3);
-        String promotion = (String) jTable3.getValueAt(index, 4);
-        String description  = (String) jTable3.getValueAt(index, 5);
 
-        if(jTable3.getValueAt(index, 2) == null || jTable3.getValueAt(index, 3) == null){
+
+        if(jTable3.getValueAt(index, 2) == "" || jTable3.getValueAt(index, 3) == "" || jTable3.getValueAt(index,5) == ""){
             return false;
         }
 
+        Integer price = (Integer) jTable3.getValueAt(index, 3);
+        Integer type = (Integer) jTable3.getValueAt(index, 2);
 
-        if(description.equals(" ")){
+        if (type < 0 || price < 0) {
             return false;
         }
-
 
         return true;
     }
 
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
+        Vector vector = new Vector();
+        if(!data.isEmpty()){
+            if(isValidRow(data.size() - 1)){
+                int ID = Integer.parseInt(String.valueOf(data.get(data.size() - 1).get(0))) + 1;
+                vector.add(String.valueOf(ID));
+                vector.add(String.valueOf(ID));
+                vector.add("");
+                vector.add("");
+                vector.add("0");
+                vector.add("none");
 
+                this.data.add(vector);
+                tableModel.setDataVector(data, table_header);
+            }
+        }
+        else {
+            int ID = 1;
+            vector.add(String.valueOf(ID));
+            vector.add(String.valueOf(ID));
+            vector.add("");
+            vector.add("");
+            vector.add("0");
+            vector.add("none");
+
+            this.data.add(vector);
+            tableModel.setDataVector(data, table_header);
+        }
+
+
+    }
 
 
     private Vector table_header;
