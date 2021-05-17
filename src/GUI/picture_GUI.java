@@ -1,6 +1,7 @@
 package GUI;
 
 import BUS.*;
+import DTO.Picture;
 import DTO.Promotion;
 import DTO.Staff;
 
@@ -111,11 +112,11 @@ public class picture_GUI extends JFrame {
         });
 
         applyBtn.setText("Apply");
-//        applyBtn.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent evt) {
-//                jButton2ActionPerformed(evt);
-//            }
-//        });
+        applyBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         removeBtn.setText("Remove");
         removeBtn.addActionListener(new ActionListener() {
@@ -229,6 +230,27 @@ public class picture_GUI extends JFrame {
 
     }
 
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
+        ArrayList<Picture> list = new ArrayList<>();
+
+        for(int row = 0; row < data.size(); row++){
+            if(isValidRow(row)){
+                String ID = (String) jTable3.getValueAt(row, 0);
+                String barcode = (String) jTable3.getValueAt(row, 1);
+                Integer type = (Integer) jTable3.getValueAt(row, 2);
+                Integer price = (Integer) jTable3.getValueAt(row, 3);
+                String promotion  = (String) jTable3.getValueAt(row, 4);
+                String description  = (String) jTable3.getValueAt(row, 5);
+
+                list.add(new Picture(ID,barcode,price,type,promotion,description));
+            }
+        }
+
+        if(picture_BUS.updatePicture(list) > 0){
+            this.loadData();
+        }
+    }
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
         int selectedRow = jTable3.getSelectedRow();
