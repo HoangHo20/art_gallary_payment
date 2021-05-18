@@ -5,6 +5,12 @@ import DTO.Picture;
 import DTO.Promotion;
 import DTO.Staff;
 
+import javax.print.*;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.standard.Copies;
+import javax.print.attribute.standard.MediaPrintableArea;
+import javax.print.attribute.standard.OrientationRequested;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -12,10 +18,16 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Vector;
+import org.krysalis.barcode4j.impl.code128.Code128Bean;
+import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
 
 public class picture_GUI extends JFrame {
 
@@ -62,6 +74,7 @@ public class picture_GUI extends JFrame {
         addBtn = new JButton();
         applyBtn = new JButton();
         removeBtn = new JButton();
+        printLabelBtn = new JButton();
 
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -126,6 +139,13 @@ public class picture_GUI extends JFrame {
             }
         });
 
+        printLabelBtn.setText("Print Label");
+        printLabelBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                jButton4ActionPerformed(e);
+            }
+        });
+
         GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -138,6 +158,8 @@ public class picture_GUI extends JFrame {
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(removeBtn)
                                 .addGap(136, 136, 136))
+                                .addComponent(printLabelBtn)
+                                .addGap(136,136,136)
         );
         jPanel1Layout.setVerticalGroup(
                 jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -146,7 +168,8 @@ public class picture_GUI extends JFrame {
                                 .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                         .addComponent(addBtn)
                                         .addComponent(applyBtn)
-                                        .addComponent(removeBtn))
+                                        .addComponent(removeBtn)
+                                        .addComponent(printLabelBtn))
                                 .addContainerGap())
         );
 
@@ -269,6 +292,57 @@ public class picture_GUI extends JFrame {
         }
     }
 
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {
+        int selectedRow = jTable3.getSelectedRow();
+        if(selectedRow >= 0){
+            String barcode = (String) jTable3.getValueAt(selectedRow, 1);
+            try {
+
+
+                Code128Bean code128 = new Code128Bean();
+                code128.setHeight(13f);
+                code128.setModuleWidth(0.3);
+                code128.setQuietZone(10);
+                code128.doQuietZone(true);
+
+                ByteArrayOutputStream image = new ByteArrayOutputStream();
+                BitmapCanvasProvider canvas = new BitmapCanvasProvider(image, "image/x-png", 300, BufferedImage.TYPE_BYTE_BINARY, false, 0);
+                code128.generateBarcode(canvas, barcode);
+                canvas.finish();
+
+
+                //write to png file
+                FileOutputStream fos = new FileOutputStream("label_barcode_image.png");
+                fos.write(image.toByteArray());
+                fos.flush();
+                fos.close();
+
+                PrintRequestAttributeSet Attr = new HashPrintRequestAttributeSet();
+                Attr.add(OrientationRequested.PORTRAIT);
+                Attr.add(new MediaPrintableArea(60, 60, 60, 60, MediaPrintableArea.MM));
+                Attr.add(new Copies(1));
+
+                PrintService ps[] = PrintServiceLookup.lookupPrintServices(DocFlavor.INPUT_STREAM.GIF, null);
+                if (ps.length == 0)
+                    throw new RuntimeException("No printer services available.");
+                PrintService p = ps[0];
+                for (int i = 0 ;i < ps.length; i ++){
+                    if(ps[i].toString().contains("Brother TD-2020")) {
+                        p = ps[i];
+                    }
+                }
+                DocPrintJob job = p.createPrintJob();
+                FileInputStream fin = new FileInputStream("label_barcode_image.png");
+                Doc doc = new SimpleDoc(fin, DocFlavor.INPUT_STREAM.GIF, null);
+                job.print(doc, Attr);
+                fin.close();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     private Vector table_header;
     private Vector<Vector> data;
@@ -277,6 +351,7 @@ public class picture_GUI extends JFrame {
     private javax.swing.JButton addBtn;
     private javax.swing.JButton applyBtn;
     private javax.swing.JButton removeBtn;
+    private javax.swing.JButton printLabelBtn;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTable jTable1;
