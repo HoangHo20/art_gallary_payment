@@ -6,10 +6,16 @@ package GUI;/*
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Vector;
 import BUS.*;
+import DTO.*;
 
 /**
  *
@@ -17,16 +23,51 @@ import BUS.*;
  */
 public class start_menu_GUI extends javax.swing.JFrame {
     // Thread load data
-    Thread load_data_thread;
+    Thread load_data_thread, bill_clock_thread;
+    int clock_hour, clock_min, clock_day, clock_month, clock_year;
     public static int gap_time_update_data = 2000;
     /**
      * Creates new form start_menu_GUI
      */
     public start_menu_GUI() {
         initComponents();
+        initBillClock();
         initHeader();
         setItemInTableClickListener();
+        load_staf_data();
         createAutoLoadUpdateData();
+    }
+
+    private void load_staf_data() {
+        staff = staff_BUS.getFirstStaffByName("admin");
+
+        if (staff == null) {
+            JOptionPane.showMessageDialog(jPanel_main, "No admin staff found", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        jTextField_bill_staff.setText(staff.getName());
+    }
+
+    private void initBillClock() { //clock update every 1 minute
+        bill_clock_thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    Calendar calendar = Calendar.getInstance();
+
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+                    jTextField_bill_customer_date.setText(formatter.format(calendar.getTime()));
+
+                    try {
+                        Thread.sleep(60000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        bill_clock_thread.start();
     }
 
     private void setItemInTableClickListener() {
@@ -234,7 +275,7 @@ public class start_menu_GUI extends javax.swing.JFrame {
         // init tables headers
         initHeader();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setTitle("art gallery store");
 
         jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.LINE_AXIS));
@@ -315,7 +356,7 @@ public class start_menu_GUI extends javax.swing.JFrame {
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel3.setLabelFor(textField_cus_addr);
-        jLabel3.setText("Address");
+        jLabel3.setText("Type");
         jLabel3.setToolTipText("");
         jPanel3.add(jLabel3);
 
@@ -451,7 +492,7 @@ public class start_menu_GUI extends javax.swing.JFrame {
         jPanel_bill_info.add(jTextField_bill_customer_name);
 
         jLabel10.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel10.setText("Address");
+        jLabel10.setText("Type");
         jPanel_bill_info.add(jLabel10);
 
         jTextField_bill_customer_addr.setEditable(false);
@@ -515,7 +556,7 @@ public class start_menu_GUI extends javax.swing.JFrame {
         });
 
         jButton_bill_print.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jButton_bill_print.setText("Print");
+        jButton_bill_print.setText("Clear");
         jButton_bill_print.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton_bill_printActionPerformed(evt);
@@ -649,6 +690,163 @@ public class start_menu_GUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>
 
+    // ------------------------------ Functions ------------------------------
+    // >>>>>>>> pay the bill
+    private boolean check_customer_info_before_pay() {
+        String name, phone, type_string;
+        int type = 0;
+        name = jTextField_bill_customer_name.getText().toString();
+        type_string = jTextField_bill_customer_addr.getText().toString();
+        phone = jTextField_bill_customer_phone.getText().toString();
+
+        // add customer
+        if (phone != null && !phone.isEmpty()) {
+            if (!isDigitOnly(phone)) {
+                //Show error message
+                JOptionPane.showMessageDialog(jPanel_customer, "Phone should contain number only", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                customer = customer_BUS.getCustomerByPhone(phone);
+
+                if (customer == null) {
+                    if (name == null || name.isEmpty()) {
+                        JOptionPane.showMessageDialog(jPanel_customer, "Please enter customer name first", "Warning", JOptionPane.WARNING_MESSAGE);
+                        return false;
+                    }
+
+                    if (type_string != null && !type_string.isEmpty()) {
+                        try {
+                            type = Integer.parseInt(type_string);
+                        } catch (NumberFormatException e) {
+                            JOptionPane.showMessageDialog(jPanel_customer, "Type of customer must be number", "Error", JOptionPane.ERROR_MESSAGE);
+                            return false;
+                        }
+                    } else {
+                        type = 0;
+                    }
+
+                    if (type > 1 || type < 0) {
+                        JOptionPane.showMessageDialog(jPanel_customer, "Please enter customer correct customer type", "Warning", JOptionPane.WARNING_MESSAGE);
+                        return false;
+                    }
+
+                    customer = new Customer();
+                    customer.setType(type);
+                    customer.setName(name);
+                    customer.setPhone(phone);
+
+                    customer_BUS.insertCustomer(customer);
+
+                    customer = customer_BUS.getCustomerByPhone(phone);
+                }
+
+                update_customer_info_ui(customer);
+            }
+        } else {
+            JOptionPane.showMessageDialog(jPanel_customer, "Please enter customer info", "Warning", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+
+        return true;
+    }
+
+    private void perform_pay_bill() {
+        if (bill_table_controller.bill_data.size() < 1) {
+            JOptionPane.showMessageDialog(jPanel_bill, "Bill empty", "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // check customer exist or add and load customer before pay
+        if (check_customer_info_before_pay()) {
+
+            // save to bill
+            try {
+                int total_bill = bill_table_controller.getTotal_bill();
+                int staff_id = Integer.parseInt(staff.getID());
+                int customer_id = customer.getID();
+                Date date = new Date();
+
+                Bill bill = new Bill(total_bill, staff_id, customer_id, date);
+
+                int insert_res_bill_id = bill_BUS.insertBill(bill);
+
+                if (insert_res_bill_id > 0) {
+                    bill_table_controller.pay_the_bill(insert_res_bill_id);
+                    jTextField_bill_no.setText(String.valueOf(insert_res_bill_id));
+                }
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(jPanel_bill, "An error occurs when pay the bill", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+    }
+
+    private void link_pictures_to_bill_pay() {
+
+    }
+
+    // >>>>>>>> customer info input
+    private boolean isDigitOnly(String str) {
+        for (int i=0; i < str.length(); i++) {
+            if (str.charAt(i) < '0' || str.charAt(i) > '9')
+                return false;
+        }
+
+        return true;
+    }
+
+    private void update_customer_info_ui(Customer cus) {
+        String cus_name = cus.getName();
+        String cus_phone = cus.getPhone();
+        int cus_type = cus.getType();
+
+        update_customer_info_ui(cus_name, cus_type, cus_phone);
+    }
+
+    private void update_customer_info_ui(String name, int type, String phone) {
+        // load to ui
+        textField_cus_name.setText(name);
+        jTextField_bill_customer_name.setText(name);
+
+        textField_cus_addr.setText(String.valueOf(type));
+        jTextField_bill_customer_addr.setText(String.valueOf(type));
+
+        jTextField_bill_customer_phone.setText(phone);
+    }
+
+    private void perform_add_customer() {
+        String name, phone, type_string;
+        int type = 0;
+        name = textField_cus_name.getText().toString();
+        type_string = textField_cus_addr.getText().toString();
+        phone = textField_cus_phone.getText().toString();
+
+        if (type_string != null && !type_string.isEmpty()) {
+            try {
+                type = Integer.parseInt(type_string);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(jPanel_customer, "Type of customer must be number", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        if (phone != null && !phone.isEmpty()) {
+            if (!isDigitOnly(phone)) {
+                //Show error message
+                JOptionPane.showMessageDialog(jPanel_customer, "Phone should contain number only", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+
+                customer = customer_BUS.getCustomerByPhone(phone);
+
+                if (customer != null) {
+                    update_customer_info_ui(customer);
+                } else {
+                    update_customer_info_ui(name, type, phone);
+                }
+            }
+        }
+    }
+
+    // >>>>>>>>> search
     private void perform_search() {
         String barcode, description, price_string;
         int price;
@@ -664,7 +862,7 @@ public class start_menu_GUI extends javax.swing.JFrame {
                 price = Integer.parseInt(price_string);
             }
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(jPanel_picture, "price should be number only");
+            JOptionPane.showMessageDialog(jPanel_picture, "price should be number only", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -699,45 +897,76 @@ public class start_menu_GUI extends javax.swing.JFrame {
 
     private void jButton_bill_payActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
+        perform_pay_bill();
     }
 
     private void jButton_bill_printActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
+        bill_table_controller.clearData_bill();
     }
 
     // -------------------------------- Navigator --------------------------------
     private void jButton_manage_pictureActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new picture_GUI().setVisible(true);
+            }
+        });
     }
 
     private void jButton_manage_promotionActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new promotion_GUI().setVisible(true);
+            }
+        });
     }
 
     private void jButton_manage_staffActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new staff_GUI().setVisible(true);
+            }
+        });
     }
 
     private void jButton_manage_customerActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new customer_GUI().setVisible(true);
+            }
+        });
     }
 
     // -------------------------------- key press ---------------------------------
     private void textField_cus_phoneKeyPressed(java.awt.event.KeyEvent evt) {
         // TODO add your handling code here:
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            perform_add_customer();
+        }
     }
 
     // -------------------------------- search ------------------------------------
     private void textField_pic_barcodeKeyPressed(java.awt.event.KeyEvent evt) {
         // TODO add your handling code here:
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER)
+            perform_search();
     }
 
     private void textField_pic_nameKeyPressed(java.awt.event.KeyEvent evt) {
         // TODO add your handling code here:
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER)
+            perform_search();
     }
 
     private void textField_pic_priceKeyPressed(java.awt.event.KeyEvent evt) {
         // TODO add your handling code here:
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER)
+            perform_search();
     }
 
     /**
@@ -774,7 +1003,13 @@ public class start_menu_GUI extends javax.swing.JFrame {
             }
         });
     }
-    //Search table
+    // Staff
+    Staff staff = null;
+
+    // Customer data
+    Customer customer = null;
+
+    // Search table
     private JTable search_table;
     private DefaultTableModel search_tableModel;
     private Vector<Vector> search_data;
@@ -867,25 +1102,35 @@ public class start_menu_GUI extends javax.swing.JFrame {
 
     class bill_table_UI {
         private Vector<Vector> bill_data;
+        private int total_bill;
 
         public bill_table_UI() {
             bill_data = new Vector<>();
+            total_bill = 0;
+
+            updateBillTotalPrice();
         }
 
         public void setData(Vector<Vector> data) {
             bill_data = data;
+
+            updateBillTotalPrice();
         }
 
         public void insertToBill(Vector row) {
             if (!isRowExist(row)) {
                 bill_data.add(row);
                 bill_tableModel.fireTableDataChanged();
+
+                updateBillTotalPrice();
             }
         }
 
         public void deleteItemOutOfBill(int row_num) {
             bill_data.remove(row_num);
             bill_tableModel.fireTableDataChanged();
+
+            updateBillTotalPrice();
         }
 
         public Vector<Vector> getData() {
@@ -900,6 +1145,50 @@ public class start_menu_GUI extends javax.swing.JFrame {
             }
 
             return false;
+        }
+
+        public void updateBillTotalPrice() {
+            int totalprice = 0;
+
+            try {
+                for (Vector v : bill_data) {
+                    totalprice += (int) v.get(3); //get price at column 3
+                }
+            }catch (Exception e) {
+                System.out.println(e);
+            }
+
+            DecimalFormat decimalFormat = new DecimalFormat("#,###");
+            String numberAsString = decimalFormat.format(totalprice);
+
+            jTextField_bill_total.setText(numberAsString);
+            this.total_bill = totalprice;
+        }
+
+        public int getTotal_bill() {
+            updateBillTotalPrice();
+            return this.total_bill;
+        }
+
+        public void pay_the_bill(int bill_id) {
+            for (Vector v : bill_data) {
+                String barcode = (String) v.get(1);
+                picture_BUS.update(barcode, bill_id);
+            }
+        }
+
+        public void clearData_bill() {
+            bill_data.clear();
+            bill_tableModel.fireTableDataChanged();
+            updateBillTotalPrice();
+
+            // clear info
+            jTextField_bill_no.setText("");
+            jTextField_bill_customer_name.setText("");
+            jTextField_bill_customer_addr.setText("");
+            jTextField_bill_customer_phone.setText("");
+
+            customer = null;
         }
     }
 }

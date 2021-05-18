@@ -118,4 +118,26 @@ public class customer_DAO {
         }
         return rowAffected;
     }
+
+    public static Customer selectOneByPhone(String phone){
+        Connection conn = Global_DAO.getConnection();
+        ResultSet rs = null;
+        PreparedStatement st = null;
+
+        try{
+            String sql = "select * from customer where customer.Phone LIKE ?";
+            st = conn.prepareStatement(sql);
+            st.setString(1, phone);
+            rs = st.executeQuery();
+            while(rs.next()){
+                return (new Customer(rs.getInt("ID"),
+                        rs.getString("Name"),
+                        rs.getString("Phone"),
+                        rs.getInt("Type")));
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
+    }
 }

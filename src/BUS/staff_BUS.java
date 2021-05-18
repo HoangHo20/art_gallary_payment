@@ -54,4 +54,8 @@ public class staff_BUS {
             return true;
         }
     }
+
+    public static Staff getFirstStaffByName(String name) {
+        return staff_DAO.selectOneByName(name);
+    }
 }

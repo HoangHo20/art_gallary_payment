@@ -64,7 +64,7 @@ public class picture_GUI extends JFrame {
         removeBtn = new JButton();
 
 
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         data = new Vector<>();
         initHeader();

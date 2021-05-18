@@ -66,4 +66,12 @@ public class picture_BUS {
 
         return res;
     }
+
+    public static Picture getPictureByBarcode(String barcode) {
+        return picture_DAO.selectOne(barcode);
+    }
+
+    public static int update(String barcode, int bill_id) {
+        return picture_DAO.update(barcode, bill_id);
+    }
 }

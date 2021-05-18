@@ -195,4 +195,26 @@ public class picture_DAO {
 
         return res;
     }
+
+    public static int update(String barcode, int bill_id){
+        String sqlUpdate = "UPDATE picture "
+                + "SET Bill_ID = ? "
+                + "WHERE Barcode LIKE ?";
+
+        int rowAffected = 0;
+        PreparedStatement preparedStatement = null;
+
+        Connection conn = Global_DAO.getConnection();
+
+        try{
+            preparedStatement = conn.prepareStatement(sqlUpdate);
+            preparedStatement.setInt(1, bill_id);
+            preparedStatement.setString(2, barcode);
+
+            rowAffected = preparedStatement.executeUpdate();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return rowAffected;
+    }
 }

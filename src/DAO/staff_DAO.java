@@ -163,4 +163,41 @@ public class staff_DAO {
         }
         return rowAffected;
     }
+
+    public static Staff selectOneByName(String name){
+        Connection conn = Global_DAO.getConnection();
+        ResultSet rs = null;
+        PreparedStatement st = null;
+
+        try{
+            String sql = "select * from staff where staff.Name LIKE ?";
+
+            st = conn.prepareStatement(sql);
+            st.setString(1, name);
+            rs = st.executeQuery();
+            while(rs.next()){
+                java.sql.Date dateEnd =  rs.getDate("DateEnd");
+                java.sql.Date dateStart = rs.getDate("DateStart");
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                String DateStart =  formatter.format(new java.util.Date(dateStart.getTime()));
+                String DateEnd = "";
+
+                if(dateEnd == null){
+                    DateEnd = "none";
+                }
+                else{
+                    DateEnd = formatter.format(new java.util.Date(dateEnd.getTime()));
+                }
+                return (new Staff(String.valueOf(rs.getInt("ID")),
+                        rs.getString("Name"),
+                        rs.getString("Phone"),
+                        rs.getString("Sex"),
+                        DateStart,
+                        DateEnd));
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
+    }
 }
