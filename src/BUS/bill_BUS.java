@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 public class bill_BUS {
-    public static Vector<Vector> getAllStaff(){
+    public static Vector<Vector> getAllBills(){
         ArrayList<Bill> list_pic = bill_DAO.selectAll();
         Vector<Vector> res = new Vector<>();
 

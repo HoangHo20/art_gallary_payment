@@ -74,4 +74,15 @@ public class picture_BUS {
     public static int update(String barcode, int bill_id) {
         return picture_DAO.update(barcode, bill_id);
     }
+
+    public static Vector<Vector> getPicturesByBillID(int bill_id){
+        ArrayList<Picture> list_pic = picture_DAO.selectByBillID(bill_id);
+        Vector<Vector> res = new Vector<>();
+
+        for(Picture pic: list_pic){
+            res.add(pic.toVector());
+        }
+
+        return res;
+    }
 }

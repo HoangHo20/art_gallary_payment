@@ -58,4 +58,8 @@ public class staff_BUS {
     public static Staff getFirstStaffByName(String name) {
         return staff_DAO.selectOneByName(name);
     }
+
+    public static Staff getStaffByID(String id) {
+        return staff_DAO.selectOne(id);
+    }
 }

@@ -69,4 +69,8 @@ public class customer_BUS {
 
         return count;
     }
+
+    public static Customer getCustomerByID(int id) {
+        return customer_DAO.selectOne(id);
+    }
 }

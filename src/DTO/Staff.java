@@ -112,4 +112,12 @@ public class Staff {
 
         return new Vector();
     }
+
+    public String getDateStartString() {
+        return this.dateStart;
+    }
+
+    public String getDateEndString() {
+        return this.dateEnd;
+    }
 }

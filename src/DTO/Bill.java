@@ -43,6 +43,14 @@ public class Bill {
         return new SimpleDateFormat("yyyy-MM-dd").parse(this.date);
     }
 
+    public String getDateString() {
+        return this.date;
+    }
+
+    public int getID() {
+        return this.ID;
+    }
+
     public Vector toVector() {
         Vector res = new Vector();
 

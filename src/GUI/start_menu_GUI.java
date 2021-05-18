@@ -267,6 +267,7 @@ public class start_menu_GUI extends javax.swing.JFrame {
         jButton_manage_promotion = new javax.swing.JButton();
         jButton_manage_staff = new javax.swing.JButton();
         jButton_manage_customer = new javax.swing.JButton();
+        jButton_manage_bill = new javax.swing.JButton();
 
         // init data tables header
         picture_data = new Vector<>();
@@ -656,6 +657,15 @@ public class start_menu_GUI extends javax.swing.JFrame {
         });
         jPanel_navigator.add(jButton_manage_customer);
 
+        jButton_manage_bill.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jButton_manage_bill.setText("Manage Bill");
+        jButton_manage_bill.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_manage_billActionPerformed(evt);
+            }
+        });
+        jPanel_navigator.add(jButton_manage_bill);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -942,6 +952,15 @@ public class start_menu_GUI extends javax.swing.JFrame {
         });
     }
 
+    private void jButton_manage_billActionPerformed(java.awt.event.ActionEvent evt) {
+        // TODO add your handling code here:
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new bill_GUI().setVisible(true);
+            }
+        });
+    }
+
     // -------------------------------- key press ---------------------------------
     private void textField_cus_phoneKeyPressed(java.awt.event.KeyEvent evt) {
         // TODO add your handling code here:
@@ -1045,6 +1064,7 @@ public class start_menu_GUI extends javax.swing.JFrame {
     private javax.swing.JButton jButton_manage_picture;
     private javax.swing.JButton jButton_manage_promotion;
     private javax.swing.JButton jButton_manage_staff;
+    private javax.swing.JButton jButton_manage_bill;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

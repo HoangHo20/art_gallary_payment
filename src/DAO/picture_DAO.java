@@ -217,4 +217,29 @@ public class picture_DAO {
         }
         return rowAffected;
     }
+
+    public static ArrayList<Picture> selectByBillID(int bill_id){
+        Connection conn = Global_DAO.getConnection();
+        ResultSet rs = null;
+        Statement st = null;
+        ArrayList<Picture> res = new ArrayList();
+
+        try{
+            String sql = "select * from picture WHERE Bill_ID = " + bill_id;
+            st = conn.createStatement();
+            rs = st.executeQuery(sql);
+            while(rs.next()){
+                res.add(new Picture(String.valueOf(rs.getInt("ID")),
+                        rs.getString("Barcode"),
+                        rs.getInt("Type"),
+                        rs.getInt("Price"),
+                        String.valueOf(rs.getInt("Promotion")),
+                        rs.getString("Description")));
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        return res;
+    }
 }

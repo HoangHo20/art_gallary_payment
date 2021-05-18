@@ -6,8 +6,13 @@ package GUI;
  * and open the template in the editor.
  */
 
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Vector;
+import BUS.*;
+import DTO.Bill;
 
 /**
  *
@@ -20,6 +25,55 @@ public class bill_GUI extends javax.swing.JFrame {
      */
     public bill_GUI() {
         initComponents();
+        setItemInTableClickListener();
+        loadData();
+    }
+
+    private void setItemInTableClickListener() {
+        jTable_bill.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent me) {
+                if (me.getClickCount() == 2) {     // to detect doble click events
+                    JTable target = (JTable)me.getSource();
+                    int row = target.getSelectedRow(); // select a row
+                    int column = target.getSelectedColumn(); // select a column
+                    Vector row_data = bill_tableModel.getDataVector().elementAt(row);
+
+                    int bill_id = (int)row_data.get(0);
+                    perform_show_bill_detail(bill_id);
+                }
+            }
+        });
+    }
+
+    private void perform_show_bill_detail(int bill_id) {
+        Bill bill = bill_BUS.getBillByID(bill_id);
+
+        if (bill != null) {
+            int staff_id = bill.getStaff_ID();
+            int customer_id = bill.getCustomer_ID();
+
+            java.awt.EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    new bill_detail_GUI(bill_id, staff_id, customer_id).setVisible(true);
+                }
+            });
+        }
+    }
+
+    private void loadData() {
+        bill_data.clear();
+        bill_data.addAll(bill_BUS.getAllBills());
+
+        bill_tableModel.fireTableDataChanged();
+    }
+
+    private void initHeader() {
+        this.bill_header = new Vector();
+        this.bill_header.add("ID");
+        this.bill_header.add("Total");
+        this.bill_header.add("Staff ID");
+        this.bill_header.add("Customer ID");
+        this.bill_header.add("Date");
     }
 
     /**
@@ -42,7 +96,7 @@ public class bill_GUI extends javax.swing.JFrame {
         filler5 = new javax.swing.Box.Filler(new java.awt.Dimension(20, 0), new java.awt.Dimension(20, 0), new java.awt.Dimension(20, 32767));
         filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 20), new java.awt.Dimension(0, 20), new java.awt.Dimension(32767, 20));
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(), javax.swing.BoxLayout.Y_AXIS));
         getContentPane().add(filler1);
 
@@ -55,11 +109,29 @@ public class bill_GUI extends javax.swing.JFrame {
         jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.LINE_AXIS));
         jPanel1.add(filler4);
 
+        initHeader();
+
         bill_data = new Vector<>();
         bill_tableModel = new DefaultTableModel(
-                bill_data,
-        )
-        jTable_bill.setModel();
+                bill_data, bill_header
+        ) {
+            Class[] types = new Class [] {
+                    Integer.class, Integer.class, Integer.class, Integer.class, String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                    false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        };
+
+        jTable_bill.setModel(bill_tableModel);
 
         jScrollPane2.setViewportView(jTable_bill);
 
