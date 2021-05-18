@@ -183,15 +183,21 @@ public class picture_GUI extends JFrame {
 
     private boolean isValidRow(int index){
 
-
         if(jTable3.getValueAt(index, 2) == "" || jTable3.getValueAt(index, 3) == "" || jTable3.getValueAt(index,5) == ""){
             return false;
         }
 
+        ArrayList<String> listIDPromotion = promotion_BUS.getListIDPromotion();
+
         Integer price = (Integer) jTable3.getValueAt(index, 3);
         Integer type = (Integer) jTable3.getValueAt(index, 2);
+        String promotion = (String) jTable3.getValueAt(index, 4);
 
         if (type < 0 || price < 0) {
+            return false;
+        }
+
+        if (!listIDPromotion.contains(promotion)){
             return false;
         }
 

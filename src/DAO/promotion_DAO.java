@@ -42,6 +42,26 @@ public class promotion_DAO {
         return res;
     }
 
+    public static ArrayList<String> getListIDPromotion() {
+        Connection conn = Global_DAO.getConnection();
+        ResultSet rs = null;
+        Statement st = null;
+        ArrayList<String> res = new ArrayList();
+
+        try{
+            String sql = "select ID from promotion";
+            st = conn.createStatement();
+            rs = st.executeQuery(sql);
+            while(rs.next()){
+                res.add(String.valueOf(rs.getInt("ID")));
+            }
+        } catch (Exception throwables) {
+            throwables.printStackTrace();
+        }
+
+        return res;
+    }
+
     public static Promotion selectOne(String ID){
         Connection conn = Global_DAO.getConnection();
         ResultSet rs = null;

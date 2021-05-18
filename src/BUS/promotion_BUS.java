@@ -3,6 +3,7 @@ package BUS;
 import DAO.promotion_DAO;
 import DTO.Promotion;
 
+import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -21,6 +22,10 @@ public class promotion_BUS {
         }
 
         return res;
+    }
+
+    public static ArrayList<String> getListIDPromotion() {
+        return promotion_DAO.getListIDPromotion();
     }
 
     public static int updateStaff(ArrayList<Promotion> list){
