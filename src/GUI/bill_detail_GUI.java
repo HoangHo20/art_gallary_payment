@@ -46,6 +46,7 @@ public class bill_detail_GUI extends javax.swing.JFrame {
             bill_no_label.setText(String.valueOf(bill.getID()));
             label_total_value.setText(String.valueOf(bill.getTotal()));
             label_date_value.setText(bill.getDateString());
+            setTitle("Bill NO - " + bill.getID());
         }
     }
 

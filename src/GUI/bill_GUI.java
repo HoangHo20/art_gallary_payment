@@ -97,6 +97,8 @@ public class bill_GUI extends javax.swing.JFrame {
         filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 20), new java.awt.Dimension(0, 20), new java.awt.Dimension(32767, 20));
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setTitle("bill management");
+
         getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(), javax.swing.BoxLayout.Y_AXIS));
         getContentPane().add(filler1);
 

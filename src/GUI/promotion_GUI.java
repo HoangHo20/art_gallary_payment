@@ -66,6 +66,7 @@ public class promotion_GUI extends JFrame {
 
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setTitle("promotion management");
 
         data = new Vector<>();
         initHeader();
