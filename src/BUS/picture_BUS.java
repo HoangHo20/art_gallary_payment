@@ -36,4 +36,34 @@ public class picture_BUS {
         }
         return count;
     }
+
+    public static Vector<Vector> getAvailablePictures() {
+        ArrayList<Picture> list_pic = picture_DAO.selectAvailable();
+        Vector<Vector> res = new Vector<>();
+
+        for(Picture pic: list_pic){
+            res.add(pic.toVector());
+        }
+
+        return res;
+    }
+
+    public static Vector<Vector> getPicturesByValues(String barcode, String description, int price) {
+        if (barcode == null || barcode.isEmpty())  {
+            barcode = null;
+        }
+
+        if (description == null || description.isEmpty()) {
+            description = null;
+        }
+
+        ArrayList<Picture> list_pic = picture_DAO.selectByValues(barcode, description, price);
+        Vector<Vector> res = new Vector<>();
+
+        for(Picture pic: list_pic){
+            res.add(pic.toVector());
+        }
+
+        return res;
+    }
 }

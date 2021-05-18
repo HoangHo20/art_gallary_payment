@@ -4,17 +4,118 @@ package GUI;/*
  * and open the template in the editor.
  */
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Vector;
+import BUS.*;
+
 /**
  *
  * @author HuyHoang
  */
 public class start_menu_GUI extends javax.swing.JFrame {
-
+    // Thread load data
+    Thread load_data_thread;
+    public static int gap_time_update_data = 2000;
     /**
      * Creates new form start_menu_GUI
      */
     public start_menu_GUI() {
         initComponents();
+        initHeader();
+        setItemInTableClickListener();
+        createAutoLoadUpdateData();
+    }
+
+    private void setItemInTableClickListener() {
+        // picture table
+        jTable_list_picture.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent me) {
+                if (me.getClickCount() == 2) {     // to detect doble click events
+                    JTable target = (JTable)me.getSource();
+                    int row = target.getSelectedRow(); // select a row
+                    int column = target.getSelectedColumn(); // select a column
+                    Vector row_data = picture_tableModel.getDataVector().elementAt(row);
+
+                    bill_table_controller.insertToBill(row_data);
+                }
+            }
+        });
+
+        // bill table
+        jTable_bill.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent me) {
+                if (me.getClickCount() == 2) {     // to detect doble click events
+                    JTable target = (JTable)me.getSource();
+                    int row = target.getSelectedRow(); // select a row
+                    int column = target.getSelectedColumn(); // select a column
+
+                    bill_table_controller.deleteItemOutOfBill(row);
+                }
+            }
+        });
+
+        // search table
+        search_table.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent me) {
+                if (me.getClickCount() == 2) {     // to detect doble click events
+                    JTable target = (JTable)me.getSource();
+                    int row = target.getSelectedRow(); // select a row
+                    int column = target.getSelectedColumn(); // select a column
+                    Vector row_data = search_tableModel.getDataVector().elementAt(row);
+
+                    bill_table_controller.insertToBill(row_data);
+                }
+            }
+        });
+    }
+
+    private void createAutoLoadUpdateData() {
+        load_data_thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    while (true) {
+                        // Read pictures data
+                        picture_data.clear();
+                        picture_data.addAll(picture_BUS.getAvailablePictures());
+                        picture_tableModel.fireTableDataChanged();
+
+                        // wait "gap_time_update_data" milliseconds to update new data
+                        Thread.sleep(2000);
+                    }
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(jPanel_picture,
+                            "Loading pictures data error.\nPlease check your connection to database and restart the software",
+                            "database connection error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        load_data_thread.start();
+    }
+
+    private void initHeader() {
+        // Table picture
+        this.table_picture_header = new Vector();
+        this.table_picture_header.add("ID");
+        this.table_picture_header.add("Barcode");
+        this.table_picture_header.add("Type");
+        this.table_picture_header.add("Price");
+        this.table_picture_header.add("Promotion");
+        this.table_picture_header.add("Description");
+
+        // Table bill
+        this.table_bill_header = new Vector();
+        this.table_bill_header.add("ID");
+        this.table_bill_header.add("Barcode");
+        this.table_bill_header.add("Type");
+        this.table_bill_header.add("Price");
+        this.table_bill_header.add("Promotion");
+        this.table_bill_header.add("Description");
     }
 
     /**
@@ -25,7 +126,32 @@ public class start_menu_GUI extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
+        // search
+        search_data = new Vector<>();
+        search_tableModel = new DefaultTableModel(
+                search_data, table_picture_header
+        ) {
+            Class[] types = new Class [] {
+                    String.class, String.class, Integer.class, Integer.class, String.class, String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                    false, false, false, false, false, false
+            };
 
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+
+        };
+
+        search_table = new JTable();
+        search_table.setModel(search_tableModel);
+
+        //
         jPanel1 = new javax.swing.JPanel();
         label1 = new java.awt.Label();
         jPanel_main = new javax.swing.JPanel();
@@ -34,7 +160,7 @@ public class start_menu_GUI extends javax.swing.JFrame {
         filler8 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 20), new java.awt.Dimension(0, 20), new java.awt.Dimension(32767, 20));
         jScrollPane_list_picture = new javax.swing.JScrollPane();
         jScrollPane4 = new javax.swing.JScrollPane();
-        jTable3 = new javax.swing.JTable();
+        jTable_list_picture = new javax.swing.JTable();
         jPanel_input = new javax.swing.JPanel();
         jPanel_customer = new javax.swing.JPanel();
         label2 = new java.awt.Label();
@@ -42,11 +168,11 @@ public class start_menu_GUI extends javax.swing.JFrame {
         filler6 = new javax.swing.Box.Filler(new java.awt.Dimension(20, 0), new java.awt.Dimension(20, 0), new java.awt.Dimension(20, 32767));
         jPanel3 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        textField_cus_name = new java.awt.TextField();
+        textField_cus_name = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        textField_cus_addr = new java.awt.TextField();
+        textField_cus_addr = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        textField_cus_phone = new java.awt.TextField();
+        textField_cus_phone = new javax.swing.JTextField();
         filler7 = new javax.swing.Box.Filler(new java.awt.Dimension(20, 0), new java.awt.Dimension(20, 0), new java.awt.Dimension(20, 32767));
         filler3 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 20), new java.awt.Dimension(0, 20), new java.awt.Dimension(32767, 20));
         filler4 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 30), new java.awt.Dimension(0, 30), new java.awt.Dimension(32767, 30));
@@ -56,11 +182,11 @@ public class start_menu_GUI extends javax.swing.JFrame {
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(20, 0), new java.awt.Dimension(20, 0), new java.awt.Dimension(20, 32767));
         jPanel5 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        textField_pic_barcode = new java.awt.TextField();
+        textField_pic_barcode = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        textField_pic_name = new java.awt.TextField();
+        textField_pic_name = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
-        textField_pic_price = new java.awt.TextField();
+        textField_pic_price = new javax.swing.JTextField();
         jButton_find_picture = new javax.swing.JButton();
         jButton_add_to_bill = new javax.swing.JButton();
         filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(20, 0), new java.awt.Dimension(20, 0), new java.awt.Dimension(20, 32767));
@@ -83,7 +209,7 @@ public class start_menu_GUI extends javax.swing.JFrame {
         filler13 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 20), new java.awt.Dimension(0, 20), new java.awt.Dimension(32767, 20));
         jScrollPane_bill = new javax.swing.JScrollPane();
         jScrollPane5 = new javax.swing.JScrollPane();
-        jTable4 = new javax.swing.JTable();
+        jTable_bill = new javax.swing.JTable();
         jPanel_bill_end_panel = new javax.swing.JPanel();
         jButton_bill_pay = new javax.swing.JButton();
         jButton_bill_print = new javax.swing.JButton();
@@ -100,6 +226,13 @@ public class start_menu_GUI extends javax.swing.JFrame {
         jButton_manage_promotion = new javax.swing.JButton();
         jButton_manage_staff = new javax.swing.JButton();
         jButton_manage_customer = new javax.swing.JButton();
+
+        // init data tables header
+        picture_data = new Vector<>();
+        bill_table_controller = new bill_table_UI();
+
+        // init tables headers
+        initHeader();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("art gallery store");
@@ -120,19 +253,30 @@ public class start_menu_GUI extends javax.swing.JFrame {
         jPanel_list_picture.add(jLabel7);
         jPanel_list_picture.add(filler8);
 
-        jTable3.setModel(new javax.swing.table.DefaultTableModel(
-                new Object [][] {
-                        {},
-                        {},
-                        {},
-                        {}
-                },
-                new String [] {
+        // >>>>>>>>>>>>>>>>> Picture table
+        picture_tableModel = new DefaultTableModel(
+                picture_data, table_picture_header
+        ) {
+            Class[] types = new Class [] {
+                    String.class, String.class, Integer.class, Integer.class, String.class, String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                    false, false, false, false, false, false
+            };
 
-                }
-        ));
-        jScrollPane4.setViewportView(jTable3);
-        jTable3.getAccessibleContext().setAccessibleName("table_picture");
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+
+        };
+
+        jTable_list_picture.setModel(picture_tableModel);
+        jScrollPane4.setViewportView(jTable_list_picture);
+        jTable_list_picture.getAccessibleContext().setAccessibleName("table_picture");
 
         jScrollPane_list_picture.setViewportView(jScrollPane4);
 
@@ -186,6 +330,11 @@ public class start_menu_GUI extends javax.swing.JFrame {
 
         textField_cus_phone.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         textField_cus_phone.setName("customer_phone"); // NOI18N
+        textField_cus_phone.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                textField_cus_phoneKeyPressed(evt);
+            }
+        });
         jPanel3.add(textField_cus_phone);
 
         jPanel_cutomer_inner.add(jPanel3);
@@ -217,14 +366,24 @@ public class start_menu_GUI extends javax.swing.JFrame {
         jPanel5.add(jLabel1);
 
         textField_pic_barcode.setName("picture_barcode"); // NOI18N
+        textField_pic_barcode.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                textField_pic_barcodeKeyPressed(evt);
+            }
+        });
         jPanel5.add(textField_pic_barcode);
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel5.setLabelFor(textField_pic_name);
-        jLabel5.setText("Name");
+        jLabel5.setText("Description");
         jPanel5.add(jLabel5);
 
         textField_pic_name.setName("picture_name"); // NOI18N
+        textField_pic_name.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                textField_pic_nameKeyPressed(evt);
+            }
+        });
         jPanel5.add(textField_pic_name);
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -233,12 +392,27 @@ public class start_menu_GUI extends javax.swing.JFrame {
         jPanel5.add(jLabel6);
 
         textField_pic_price.setName("picutre_price"); // NOI18N
+        textField_pic_price.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                textField_pic_priceKeyPressed(evt);
+            }
+        });
         jPanel5.add(textField_pic_price);
 
         jButton_find_picture.setText("Find");
+        jButton_find_picture.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_find_pictureActionPerformed(evt);
+            }
+        });
         jPanel5.add(jButton_find_picture);
 
         jButton_add_to_bill.setText("Add to bill");
+        jButton_add_to_bill.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_add_to_billActionPerformed(evt);
+            }
+        });
         jPanel5.add(jButton_add_to_bill);
 
         jPanel_picture_inner.add(jPanel5);
@@ -303,19 +477,30 @@ public class start_menu_GUI extends javax.swing.JFrame {
         jPanel_bill_inner.add(jPanel_bill_info);
         jPanel_bill_inner.add(filler13);
 
-        jTable4.setModel(new javax.swing.table.DefaultTableModel(
-                new Object [][] {
-                        {},
-                        {},
-                        {},
-                        {}
-                },
-                new String [] {
+        // Bill table
+        bill_tableModel = new DefaultTableModel(
+                bill_table_controller.getData(), table_bill_header
+        ) {
+            Class[] types = new Class [] {
+                    String.class, String.class, Integer.class, Integer.class, String.class, String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                    false, false, false, false, false, false
+            };
 
-                }
-        ));
-        jScrollPane5.setViewportView(jTable4);
-        jTable4.getAccessibleContext().setAccessibleName("table_bill");
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        };
+
+        jTable_bill.setModel(bill_tableModel);
+
+        jScrollPane5.setViewportView(jTable_bill);
+        jTable_bill.getAccessibleContext().setAccessibleName("table_bill");
 
         jScrollPane_bill.setViewportView(jScrollPane5);
 
@@ -323,9 +508,19 @@ public class start_menu_GUI extends javax.swing.JFrame {
 
         jButton_bill_pay.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jButton_bill_pay.setText("Pay");
+        jButton_bill_pay.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_bill_payActionPerformed(evt);
+            }
+        });
 
         jButton_bill_print.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jButton_bill_print.setText("Print");
+        jButton_bill_print.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_bill_printActionPerformed(evt);
+            }
+        });
 
         jPanel4.setLayout(new javax.swing.BoxLayout(jPanel4, javax.swing.BoxLayout.LINE_AXIS));
         jPanel4.add(filler10);
@@ -364,7 +559,7 @@ public class start_menu_GUI extends javax.swing.JFrame {
         jPanel_bill_end_panelLayout.setVerticalGroup(
                 jPanel_bill_end_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel_bill_end_panelLayout.createSequentialGroup()
-                                .addContainerGap(34, Short.MAX_VALUE)
+                                .addContainerGap(39, Short.MAX_VALUE)
                                 .addGroup(jPanel_bill_end_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                         .addGroup(jPanel_bill_end_panelLayout.createSequentialGroup()
                                                 .addGroup(jPanel_bill_end_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
@@ -386,18 +581,38 @@ public class start_menu_GUI extends javax.swing.JFrame {
 
         jButton_manage_picture.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jButton_manage_picture.setText("Manage Pictures");
+        jButton_manage_picture.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_manage_pictureActionPerformed(evt);
+            }
+        });
         jPanel_navigator.add(jButton_manage_picture);
 
         jButton_manage_promotion.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jButton_manage_promotion.setText("Manage Promotion");
+        jButton_manage_promotion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_manage_promotionActionPerformed(evt);
+            }
+        });
         jPanel_navigator.add(jButton_manage_promotion);
 
         jButton_manage_staff.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jButton_manage_staff.setText("Manage Staff");
+        jButton_manage_staff.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_manage_staffActionPerformed(evt);
+            }
+        });
         jPanel_navigator.add(jButton_manage_staff);
 
         jButton_manage_customer.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jButton_manage_customer.setText("Manage Customer");
+        jButton_manage_customer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_manage_customerActionPerformed(evt);
+            }
+        });
         jPanel_navigator.add(jButton_manage_customer);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -434,6 +649,97 @@ public class start_menu_GUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>
 
+    private void perform_search() {
+        String barcode, description, price_string;
+        int price;
+
+        barcode = textField_pic_barcode.getText().toString();
+        description = textField_pic_name.getText().toString();
+        price_string = textField_pic_price.getText().toString();
+
+        try {
+            if (price_string == null || price_string.isEmpty()) {
+                price = -1;
+            } else {
+                price = Integer.parseInt(price_string);
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(jPanel_picture, "price should be number only");
+            return;
+        }
+
+        Vector<Vector> result_search_data = picture_BUS.getPicturesByValues(barcode, description, price);
+
+        if (result_search_data != null && !result_search_data.isEmpty()) {
+            search_data.clear();
+            search_data.addAll(result_search_data);
+
+            search_tableModel.setDataVector(search_data, table_picture_header);
+        } else {
+            JOptionPane.showMessageDialog(jPanel_picture, "No result found");
+            return;
+        }
+
+        final JComponent[] components = new JComponent[] {
+                this.search_table
+        };
+
+        JOptionPane.showMessageDialog(jPanel_main, components, "Search result", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    // --------------------------------- Button press -----------------------------
+    private void jButton_find_pictureActionPerformed(java.awt.event.ActionEvent evt) {
+        // TODO add your handling code here:
+        perform_search();
+    }
+
+    private void jButton_add_to_billActionPerformed(java.awt.event.ActionEvent evt) {
+        // TODO add your handling code here:
+    }
+
+    private void jButton_bill_payActionPerformed(java.awt.event.ActionEvent evt) {
+        // TODO add your handling code here:
+    }
+
+    private void jButton_bill_printActionPerformed(java.awt.event.ActionEvent evt) {
+        // TODO add your handling code here:
+    }
+
+    // -------------------------------- Navigator --------------------------------
+    private void jButton_manage_pictureActionPerformed(java.awt.event.ActionEvent evt) {
+        // TODO add your handling code here:
+    }
+
+    private void jButton_manage_promotionActionPerformed(java.awt.event.ActionEvent evt) {
+        // TODO add your handling code here:
+    }
+
+    private void jButton_manage_staffActionPerformed(java.awt.event.ActionEvent evt) {
+        // TODO add your handling code here:
+    }
+
+    private void jButton_manage_customerActionPerformed(java.awt.event.ActionEvent evt) {
+        // TODO add your handling code here:
+    }
+
+    // -------------------------------- key press ---------------------------------
+    private void textField_cus_phoneKeyPressed(java.awt.event.KeyEvent evt) {
+        // TODO add your handling code here:
+    }
+
+    // -------------------------------- search ------------------------------------
+    private void textField_pic_barcodeKeyPressed(java.awt.event.KeyEvent evt) {
+        // TODO add your handling code here:
+    }
+
+    private void textField_pic_nameKeyPressed(java.awt.event.KeyEvent evt) {
+        // TODO add your handling code here:
+    }
+
+    private void textField_pic_priceKeyPressed(java.awt.event.KeyEvent evt) {
+        // TODO add your handling code here:
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -468,6 +774,19 @@ public class start_menu_GUI extends javax.swing.JFrame {
             }
         });
     }
+    //Search table
+    private JTable search_table;
+    private DefaultTableModel search_tableModel;
+    private Vector<Vector> search_data;
+
+    // Table define
+    private DefaultTableModel picture_tableModel;
+    private Vector table_picture_header;
+    private Vector<Vector> picture_data;
+
+    private DefaultTableModel bill_tableModel;
+    private Vector table_bill_header;
+    private bill_table_UI bill_table_controller;
 
     // Variables declaration - do not modify
     private javax.swing.Box.Filler filler1;
@@ -526,8 +845,8 @@ public class start_menu_GUI extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane_bill;
     private javax.swing.JScrollPane jScrollPane_list_picture;
-    private javax.swing.JTable jTable3;
-    private javax.swing.JTable jTable4;
+    private javax.swing.JTable jTable_bill;
+    private javax.swing.JTable jTable_list_picture;
     private javax.swing.JTextField jTextField_bill_customer_addr;
     private javax.swing.JTextField jTextField_bill_customer_date;
     private javax.swing.JTextField jTextField_bill_customer_name;
@@ -538,11 +857,49 @@ public class start_menu_GUI extends javax.swing.JFrame {
     private java.awt.Label label1;
     private java.awt.Label label2;
     private java.awt.Label label6;
-    private java.awt.TextField textField_cus_addr;
-    private java.awt.TextField textField_cus_name;
-    private java.awt.TextField textField_cus_phone;
-    private java.awt.TextField textField_pic_barcode;
-    private java.awt.TextField textField_pic_name;
-    private java.awt.TextField textField_pic_price;
+    private javax.swing.JTextField textField_cus_addr;
+    private javax.swing.JTextField textField_cus_name;
+    private javax.swing.JTextField textField_cus_phone;
+    private javax.swing.JTextField textField_pic_barcode;
+    private javax.swing.JTextField textField_pic_name;
+    private javax.swing.JTextField textField_pic_price;
     // End of variables declaration
+
+    class bill_table_UI {
+        private Vector<Vector> bill_data;
+
+        public bill_table_UI() {
+            bill_data = new Vector<>();
+        }
+
+        public void setData(Vector<Vector> data) {
+            bill_data = data;
+        }
+
+        public void insertToBill(Vector row) {
+            if (!isRowExist(row)) {
+                bill_data.add(row);
+                bill_tableModel.fireTableDataChanged();
+            }
+        }
+
+        public void deleteItemOutOfBill(int row_num) {
+            bill_data.remove(row_num);
+            bill_tableModel.fireTableDataChanged();
+        }
+
+        public Vector<Vector> getData() {
+            return bill_data;
+        }
+
+        public boolean isRowExist(Vector row) {
+            String ID = (String)row.get(0);
+
+            for (Vector v : bill_data) {
+                if (v.equals(row)) return true;
+            }
+
+            return false;
+        }
+    }
 }

@@ -132,4 +132,67 @@ public class picture_DAO {
         }
         return rowAffected;
     }
+
+    public static ArrayList<Picture> selectAvailable(){ //select that pictures that haven't been sold in any bill
+        Connection conn = Global_DAO.getConnection();
+        ResultSet rs = null;
+        Statement st = null;
+        ArrayList<Picture> res = new ArrayList();
+
+        try{
+            String sql = "select * from picture where Bill_ID IS NULL";
+            st = conn.createStatement();
+            rs = st.executeQuery(sql);
+            while(rs.next()){
+                res.add(new Picture(String.valueOf(rs.getInt("ID")),
+                        rs.getString("Barcode"),
+                        rs.getInt("Type"),
+                        rs.getInt("Price"),
+                        String.valueOf(rs.getInt("Promotion")),
+                        rs.getString("Description")));
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        return res;
+    }
+
+    public static ArrayList<Picture> selectByValues(String barcode, String description, int price){ //select that pictures that haven't been sold in any bill
+        Connection conn = Global_DAO.getConnection();
+        ResultSet rs = null;
+        Statement st = null;
+        ArrayList<Picture> res = new ArrayList();
+
+        try{
+            String sql = "select * from picture where Bill_ID IS NULL";
+
+            if (barcode != null) {
+                sql += " AND Barcode LIKE '%" + barcode + "%'";
+            }
+
+            if (description != null) {
+                sql += " AND Description LIKE '%" + description + "%'";
+            }
+
+            if (price > -1) {
+                sql += " AND Price = " + price;
+            }
+
+            st = conn.createStatement();
+            rs = st.executeQuery(sql);
+            while(rs.next()){
+                res.add(new Picture(String.valueOf(rs.getInt("ID")),
+                        rs.getString("Barcode"),
+                        rs.getInt("Type"),
+                        rs.getInt("Price"),
+                        String.valueOf(rs.getInt("Promotion")),
+                        rs.getString("Description")));
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        return res;
+    }
 }
