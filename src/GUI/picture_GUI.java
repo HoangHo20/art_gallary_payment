@@ -78,6 +78,7 @@ public class picture_GUI extends JFrame {
 
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setResizable(false);
         setTitle("picture management");
 
         data = new Vector<>();

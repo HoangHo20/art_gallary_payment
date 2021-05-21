@@ -62,6 +62,7 @@ public class customer_GUI extends JFrame {
 
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setResizable(false);
         setTitle("customer management");
 
         data = new Vector<>();

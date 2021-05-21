@@ -277,6 +277,7 @@ public class start_menu_GUI extends javax.swing.JFrame {
         initHeader();
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
         setTitle("art gallery store");
 
         jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.LINE_AXIS));

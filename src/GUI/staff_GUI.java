@@ -71,6 +71,7 @@ public class staff_GUI extends javax.swing.JFrame {
 
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setResizable(false);
         setTitle("staff management");
 
         data = new Vector<>();
